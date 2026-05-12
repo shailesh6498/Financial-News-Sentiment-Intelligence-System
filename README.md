@@ -37,3 +37,6 @@ Google Finance, and Meta's content ranking pipeline — built from scratch.
 - [ ] Phase 4 — Feature engineering + stock data fusion
 - [ ] Phase 5 — ML modelling (XGBoost + LSTM)
 - [ ] Phase 6 — Live deployment
+
+
+# Testing Github Connection
