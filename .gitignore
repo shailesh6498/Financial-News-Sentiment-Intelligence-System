@@ -6,6 +6,27 @@ __pycache__/
 # C extensions
 *.so
 
+#OS files
+.DS_Store
+Thumbs.db
+
+# Model files (too large for github)
+models/*.pkl
+models/*.pt 
+models/*.h5
+
+#VS Code
+.vscode/
+
+# scaffolding script - not needed in production 
+setup_project.py
+
+#Python cache
+__pycache__/
+*.PyCharm
+*.pyflow
+*.pybuilder
+
 # Distribution / packaging
 .Python
 build/
