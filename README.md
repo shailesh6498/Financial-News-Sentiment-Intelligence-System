@@ -30,10 +30,14 @@ Google Finance, and Meta's content ranking pipeline — built from scratch.
 | `all_news.csv` | Raw collected data — 50 articles, 5 companies |
 
 ## ✅ Progress
+- [x] Project setup — VS Code, venv, folder structure
+- [x] Phase 1 — Data collection (50 articles, 5 companies)
+- [x] Phase 2 — EDA (6-layer analysis, 4 charts, cleaned dataset)
+- [ ] Phase 3 — FinBERT sentiment scoring
+- [ ] Phase 4 — Feature engineering
+- [ ] Phase 5 — ML modelling
+- [ ] Phase 6 — Deployment
 
-- [x] Phase 1 — Data collection pipeline (50 articles, 5 companies)
-- [ ] Phase 2 — EDA and data cleaning
-- [ ] Phase 3 — NLP sentiment scoring with FinBERT
-- [ ] Phase 4 — Feature engineering + stock data fusion
-- [ ] Phase 5 — ML modelling (XGBoost + LSTM)
-- [ ] Phase 6 — Live deployment
+## 📊 EDA Charts
+![Article Distribution](reports/figures/01_article_distribution.png)
+![Coverage Heatmap](reports/figures/02_coverage_heatmap.png)
