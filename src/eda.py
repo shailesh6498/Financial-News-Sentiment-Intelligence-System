@@ -96,8 +96,17 @@ def _parse_dates(df: pd.DataFrame) -> pd.Series:
         Series of datetime64 values (NaT where parsing fails)
     """
     # try date_clean first — it is YYYY-MM-DD, clean and fast
-    if "date_clean" in df.columns:
-        parsed = pd.to_datetime(df["date_clean"], errors="coerce")
+    try:
+        parsed = pd.to_datetime(
+            df["date"],
+            format="%d %B %Y, %I:%M %p UTC",
+            errors="coerce"
+        )
+    except Exception:
+        # fallback if format changes in future collection runs
+        parsed= pd.to_datetime(
+            df["date"], dayfirst=True, errors='coerce'
+        )
         if parsed.notna().sum() > 0:
             logger.info(
                 f"Dates parsed from date_clean "
@@ -115,7 +124,7 @@ def _parse_dates(df: pd.DataFrame) -> pd.Series:
             f"Dates parsed from date column "
             f"({parsed.notna().sum()}/{len(df)} valid)"
         )
-        return parsed
+        return parsed 
 
     # nothing worked — return empty series
     logger.warning("Could not parse any dates from this DataFrame")
@@ -145,7 +154,14 @@ def _extract_hours(df: pd.DataFrame) -> pd.Series:
     Returns:
         Series of integer hours (0-23), NaN where unavailable
     """
-    if "date" in df.columns:
+    try:
+        parsed = pd.to_datetime(
+            df["date"],
+            format="%d %B %Y, %I:%M %p UTC",
+            errors="coerce"
+        )
+    except Exception:
+        #fallback if format changes in future collection run
         parsed = pd.to_datetime(
             df["date"], dayfirst=True, errors="coerce"
         )
@@ -170,7 +186,7 @@ def _save_figure(fig: plt.Figure, filename: str) -> str:
     ensure_dirs(REPORTS_PATH)
     path = os.path.join(REPORTS_PATH, filename)
     fig.savefig(path, dpi=150, bbox_inches="tight")
-    logger.info(f"Chart saved → {path}")
+    logger.info(f"Chart saved : {path}")
     return path
 
 
@@ -772,17 +788,17 @@ def clean_and_save(
 
     Cleaning decisions and why:
     1. Remove exact duplicate titles
-       → duplicates inflate sentiment signal for one event
+       -> duplicates inflate sentiment signal for one event
     2. Remove rows where date_clean is null or unknown
-       → cannot merge with stock prices without a valid date
+       -> cannot merge with stock prices without a valid date
     3. Strip whitespace from text columns
-       → consistent input for FinBERT tokeniser
+       -> consistent input for FinBERT tokeniser
     4. Add title_word_count
-       → Phase 3 uses this to flag very short headlines
+       -> Phase 3 uses this to flag very short headlines
     5. Add date_parsed (proper datetime)
-       → Phase 4 needs this for time-based feature joins
+       -> Phase 4 needs this for time-based feature joins
     6. Sort by ticker + date_clean
-       → clean ordering for sequential model input
+       -> clean ordering for sequential model input
 
     Why clean AFTER EDA not before?
     EDA tells you what cleaning is needed and why.
@@ -833,10 +849,67 @@ def clean_and_save(
     df["title_word_count"] = df["title"].str.split().str.len()
     logger.info("  Added title_word_count column")
 
-    # ── step 5: add date_parsed ────────────────────────
-    # proper datetime object for Phase 4 time-based joins
-    df["date_parsed"] = _parse_dates(df)
-    logger.info("  Added date_parsed column")
+    # ── step 5: add market session flag ───────────────────
+    # Instead of storing raw time, we encode business meaning directly
+    # This is domain-specific feature engineering used in
+    # financial ML systems at Bloomberg and hedge funds
+    #
+    # NYSE market hours in UTC:
+    #   Pre-market  : before 14:30 UTC (before 9:30am ET)
+    #   Market hours: 14:30 - 21:00 UTC (9:30am - 4:00pm ET)
+    #   Post-market : after 21:00 UTC (after 4:00pm ET)
+    #   Weekend     : Saturday or Sunday (no market activity)
+    #
+    # Why this matters for your model:
+    #   Pre-market news -> influences SAME day open price
+    #   Post-market news -> influences NEXT day open price
+    #   Weekend news -> influences Monday open price
+    #   This directly shapes the lag features in Phase 4
+
+    parsed_dt = pd.to_datetime(
+        df["date"],
+        format="%d %B %Y, %I:%M %p UTC",
+        errors="coerce"
+    )
+
+    def assign_market_session(dt_series: pd.Series) -> pd.Series:
+        """
+        Assigns market session label based on UTC hour and day.
+        Returns string labels for easy human reading and model use.
+        """
+        sessions = []
+        for dt in dt_series:
+            if pd.isna(dt):
+                sessions.append("unknown")
+                continue
+
+            # check weekend first
+            if dt.dayofweek >= 5:  # 5=Saturday, 6=Sunday
+                sessions.append("weekend")
+                continue
+
+            hour    = dt.hour
+            minute  = dt.minute
+            # convert to decimal hour for easy comparison
+            decimal = hour + minute / 60
+
+            if decimal < 14.5:
+                sessions.append("pre_market")
+            elif decimal <= 21.0:
+                sessions.append("market_hours")
+            else:
+                sessions.append("post_market")
+
+        return pd.Series(sessions, index=dt_series.index)
+
+    df["market_session"] = assign_market_session(parsed_dt)
+
+    # also keep time_clean as HH:MM for any raw time analysis
+    df["time_clean"] = parsed_dt.dt.strftime("%H:%M").fillna("unknown")
+
+    # log the distribution so you see it immediately
+    session_dist = df["market_session"].value_counts()
+    logger.info(f"  Market session distribution:\n{session_dist.to_string()}")
 
     # ── step 6: sort by ticker + date ─────────────────
     df = df.sort_values(
@@ -850,7 +923,7 @@ def clean_and_save(
 
     logger.info(
         f"Cleaning complete: "
-        f"{original_len} → {len(df)} rows "
+        f"{original_len} -> {len(df)} rows "
         f"({original_len - len(df)} removed) "
         f"saved to {save_path}"
     )

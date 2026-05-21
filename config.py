@@ -26,15 +26,22 @@ import os
 # cloud, consumer hardware, enterprise software)
 COMPANIES = ["AAPL", "GOOGL", "META", "AMZN", "MSFT"]
 
+
 # ── file paths ────────────────────────────────────────────
-# all paths relative to project root
-# os.path.join handles Windows backslash vs Mac/Linux
-# forward slash automatically — cross-platform safe
-RAW_DATA_PATH       = os.path.join("data", "raw",       "all_news.csv")
-PROCESSED_DATA_PATH = os.path.join("data", "processed", "news_clean.csv")
-FEATURES_PATH       = os.path.join("data", "features",  "model_input.csv")
-MODEL_PATH          = os.path.join("models",             "xgboost_sentiment.pkl")
-REPORTS_PATH        = os.path.join("reports", "figures")
+# BASE_DIR is the absolute path to your project root
+# Every other path is built from this
+# Why: eliminates all relative path confusion permanently
+# Whether code runs from notebooks/, src/, or root —
+# all paths resolve to the same place every time
+
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
+RAW_DATA_PATH       = os.path.join(BASE_DIR, "data", "raw",       "all_news.csv")
+PROCESSED_DATA_PATH = os.path.join(BASE_DIR, "data", "processed", "news_clean.csv")
+FEATURES_PATH       = os.path.join(BASE_DIR, "data", "features",  "model_input.csv")
+MODEL_PATH          = os.path.join(BASE_DIR, "models",             "xgboost_sentiment.pkl")
+REPORTS_PATH        = os.path.join(BASE_DIR, "reports",            "figures")
+SENTIMENT_SAVE_PATH  = os.path.join(BASE_DIR, "data", "processed", "news_sentiment.csv")
 
 # ── model settings ────────────────────────────────────────
 RANDOM_STATE  = 42      # fixed seed = reproducible results every run
@@ -49,3 +56,6 @@ NEWS_LOOKBACK_DAYS       = 30      # how far back to consider news fresh
 # ── sentiment settings ────────────────────────────────────
 SENTIMENT_MODEL    = "ProsusAI/finbert"   # HuggingFace model ID
 SENTIMENT_BATCH_SIZE = 16                 # articles per FinBERT batch
+SENTIMENT_SAVE_PATH  = os.path.join(
+    BASE_DIR, "data", "processed", "news_sentiment.csv"
+)
