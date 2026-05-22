@@ -26,6 +26,19 @@ import os
 # cloud, consumer hardware, enterprise software)
 COMPANIES = ["AAPL", "GOOGL", "META", "AMZN", "MSFT"]
 
+# ── chart colors per company ──────────────────────────────
+# defined once here — used by eda.py, sentiment.py,
+# features.py, dashboard.py
+# keeping colors consistent across all charts makes your
+# project look professionally designed, not cobbled together
+COLORS = {
+    "AAPL" : "#5B8DB8",
+    "GOOGL": "#E8834D",
+    "META" : "#6BAF7A",
+    "AMZN" : "#C9637A",
+    "MSFT" : "#9B7EC8",
+}
+PALETTE = list(COLORS.values())
 
 # ── file paths ────────────────────────────────────────────
 # BASE_DIR is the absolute path to your project root
@@ -58,4 +71,7 @@ SENTIMENT_MODEL    = "ProsusAI/finbert"   # HuggingFace model ID
 SENTIMENT_BATCH_SIZE = 16                 # articles per FinBERT batch
 SENTIMENT_SAVE_PATH  = os.path.join(
     BASE_DIR, "data", "processed", "news_sentiment.csv"
+)
+SENTIMENT_FILTERED_PATH = os.path.join(
+    BASE_DIR, "data", "processed", "news_sentiment_filtered.csv"
 )

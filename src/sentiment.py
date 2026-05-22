@@ -473,3 +473,84 @@ def sentiment_over_time(df: pd.DataFrame) -> pd.DataFrame:
     ].diff().round(4)
 
     return daily
+
+def filter_relevant_articles(df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Removes articles where the headline does not mention
+    the company it is tagged under.
+
+    Why this matters:
+        Yahoo Finance returns general market news alongside
+        company-specific news. An article about Intel
+        tagged under AAPL contaminates Apple's sentiment
+        score with Intel's news signal.
+
+        This is called topic leakage — one of the most
+        common data quality issues in financial NLP.
+
+        Bloomberg solves this with named entity recognition
+        (NER) to verify company mentions. We use a simpler
+        but effective approach: check if the ticker, company
+        name, or known aliases appear in the headline.
+
+    Interview answer:
+        "I discovered that Yahoo Finance returns general
+        market news tagged under specific company tickers.
+        I built a relevance filter that checks whether
+        the headline actually mentions the company — either
+        by ticker, full name, or known aliases. This removed
+        X% of contaminated articles and improved sentiment
+        accuracy for each company."
+
+    Args:
+        df: scored DataFrame with ticker and title columns
+
+    Returns:
+        filtered DataFrame with only relevant articles
+    """
+    # company name aliases — ticker to list of name variants
+    # Why aliases? Headlines rarely say "AAPL" — they say
+    # "Apple", "Apple Inc", "Apple Computer" etc.
+    COMPANY_ALIASES = {
+        "AAPL" : ["apple", "aapl", "iphone", "ipad", "mac",
+                  "tim cook", "ios", "macos"],
+        "GOOGL": ["google", "googl", "alphabet", "youtube",
+                  "deepmind", "waymo", "gemini", "sundar"],
+        "META" : ["meta", "facebook", "instagram", "whatsapp",
+                  "zuckerberg", "threads", "oculus"],
+        "AMZN" : ["amazon", "amzn", "aws", "prime", "alexa",
+                  "andy jassy", "bezos"],
+        "MSFT" : ["microsoft", "msft", "windows", "azure",
+                  "xbox", "linkedin", "copilot", "satya",
+                  "nadella", "bing"],
+    }
+
+    original_len = len(df)
+    relevant_mask = []
+
+    for _, row in df.iterrows():
+        ticker  = row["ticker"]
+        title   = row["title"].lower()
+        aliases = COMPANY_ALIASES.get(ticker, [ticker.lower()])
+
+        # check if any alias appears in the headline
+        is_relevant = any(alias in title for alias in aliases)
+        relevant_mask.append(is_relevant)
+
+    df_filtered = df[relevant_mask].reset_index(drop=True)
+
+    removed = original_len - len(df_filtered)
+    logger.info(
+        f"Relevance filter: removed {removed} off-topic articles "
+        f"({original_len} -> {len(df_filtered)})"
+    )
+
+    if removed > 0:
+        logger.info("Removed articles:")
+        removed_df = df[~pd.Series(relevant_mask)]
+        for _, row in removed_df.iterrows():
+            logger.info(
+                f"  [{row['ticker']}] {row['title'][:70]}"
+            )
+
+    return df_filtered

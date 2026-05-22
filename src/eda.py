@@ -62,14 +62,7 @@ plt.rcParams.update({
     "figure.titleweight": "bold",
 })
 
-COLORS = {
-    "AAPL" : "#5B8DB8",
-    "GOOGL": "#E8834D",
-    "META" : "#6BAF7A",
-    "AMZN" : "#C9637A",
-    "MSFT" : "#9B7EC8",
-}
-PALETTE = list(COLORS.values())
+from config import COLORS, PALETTE
 
 
 # ── shared date parser ────────────────────────────────────
