@@ -54,7 +54,7 @@ PROCESSED_DATA_PATH = os.path.join(BASE_DIR, "data", "processed", "news_clean.cs
 FEATURES_PATH       = os.path.join(BASE_DIR, "data", "features",  "model_input.csv")
 MODEL_PATH          = os.path.join(BASE_DIR, "models",             "xgboost_sentiment.pkl")
 REPORTS_PATH        = os.path.join(BASE_DIR, "reports",            "figures")
-SENTIMENT_SAVE_PATH  = os.path.join(BASE_DIR, "data", "processed", "news_sentiment.csv")
+SENTIMENT_SAVE_PATH = os.path.join(BASE_DIR, "data", "processed", "news_sentiment.csv")
 
 # ── model settings ────────────────────────────────────────
 RANDOM_STATE  = 42      # fixed seed = reproducible results every run
@@ -75,3 +75,23 @@ SENTIMENT_SAVE_PATH  = os.path.join(
 SENTIMENT_FILTERED_PATH = os.path.join(
     BASE_DIR, "data", "processed", "news_sentiment_filtered.csv"
 )
+
+# ── Phase 4 settings ─────────────────────────────────────
+# how many days of price history to fetch
+# we fetch 60 days to ensure we have enough price data
+# even if news only covers a few days
+PRICE_LOOKBACK_DAYS = 60
+
+# lag windows for feature engineering
+# these tell the model "what was sentiment/price N days ago?"
+LAG_DAYS = [1, 2, 3]
+
+# rolling window for moving averages
+ROLLING_WINDOW = 3
+
+# the column our ML model will predict
+TARGET_COLUMN = "price_direction"
+
+# minimum articles needed per company per day
+# days with fewer articles have unreliable sentiment
+MIN_ARTICLES_PER_DAY = 1
