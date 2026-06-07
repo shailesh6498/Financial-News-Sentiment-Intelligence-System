@@ -95,3 +95,41 @@ TARGET_COLUMN = "price_direction"
 # minimum articles needed per company per day
 # days with fewer articles have unreliable sentiment
 MIN_ARTICLES_PER_DAY = 1
+
+# ── Phase 5 settings ──────────────────────────────────────
+
+# train/test split — 80% train, 20% test
+# time-based split — never random shuffle on time series
+TRAIN_TEST_SPLIT_DATE = "2026-05-01"  # everything before = train
+                                       # everything after = test
+
+# XGBoost hyperparameters
+# explained in detail in src/model.py
+XGBOOST_PARAMS = {
+    "n_estimators"    : 100,    # how many trees to build
+    "max_depth"       : 4,      # how deep each tree can go
+    "learning_rate"   : 0.1,    # how fast the model learns
+    "subsample"       : 0.8,    # use 80% of rows per tree
+    "colsample_bytree": 0.8,    # use 80% of features per tree
+    "random_state"    : 42,     # fixed seed for reproducibility
+    "eval_metric"     : "logloss",
+    "use_label_encoder": False,
+}
+
+# features to exclude from model training
+# these are identifiers, not predictive signals
+NON_FEATURE_COLUMNS = [
+    "ticker",
+    "date_clean",
+    "day_name",        # text version of day — use day_of_week number instead
+    "price_direction", # this is the target — never a feature
+    "open",            # we don't use open — too close to yesterday's close
+    "high",            # raw OHLC creates leakage risk
+    "low",
+    "close",           # use daily_return instead — normalised
+    "volume",          # use volume_change instead — normalised
+]
+
+# model save paths
+XGBOOST_MODEL_PATH = os.path.join(BASE_DIR, "models", "xgboost_sentiment.pkl")
+MODEL_METRICS_PATH = os.path.join(BASE_DIR, "models", "model_metrics.json")

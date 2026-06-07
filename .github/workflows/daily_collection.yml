@@ -1,0 +1,37 @@
+name: Daily News Collection and Model Update
+
+# runs every day at 10pm UTC (after US market close)
+on:
+  schedule:
+    - cron: "0 22 * * 1-5"  # Mon-Fri only, markets closed on weekends
+  workflow_dispatch:          # also allows manual trigger from GitHub UI
+
+jobs:
+  collect-and-predict:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          pip install yfinance pandas numpy scikit-learn xgboost \
+                      transformers torch sentencepiece requests
+
+      - name: Run daily collection
+        run: python scripts/daily_update.py
+
+      - name: Commit updated data
+        run: |
+          git config user.email "actions@github.com"
+          git config user.name "GitHub Actions"
+          git add data/ models/
+          git diff --staged --quiet || \
+            git commit -m "auto: daily update $(date +%Y-%m-%d)"
+          git push

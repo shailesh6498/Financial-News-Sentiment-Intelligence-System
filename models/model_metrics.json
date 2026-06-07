@@ -1,0 +1,45 @@
+{
+  "accuracy": 0.475,
+  "precision": 0.4667,
+  "recall": 0.6034,
+  "f1_score": 0.5263,
+  "auc_roc": 0.5462,
+  "confusion_matrix": [
+    [
+      22,
+      40
+    ],
+    [
+      23,
+      35
+    ]
+  ],
+  "n_test_samples": 120,
+  "n_train_samples": 100,
+  "test_up_pct": 48.3,
+  "pred_up_pct": 62.5,
+  "top_features": [
+    "daily_return_lag3",
+    "volume_change_lag2",
+    "daily_return_lag2",
+    "daily_return_lag1",
+    "price_range",
+    "price_vs_5day_avg",
+    "volume_change_lag1",
+    "volume_change",
+    "volume_change_lag3",
+    "is_monday"
+  ],
+  "top_feature_scores": [
+    0.1775,
+    0.1149,
+    0.0984,
+    0.0806,
+    0.0711,
+    0.0699,
+    0.0688,
+    0.0656,
+    0.0596,
+    0.0572
+  ]
+}
