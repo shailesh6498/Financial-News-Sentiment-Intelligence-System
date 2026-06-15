@@ -22,7 +22,7 @@ jobs:
       - name: Install dependencies
         run: |
           pip install yfinance pandas numpy scikit-learn xgboost \
-                      transformers torch sentencepiece requests
+                      transformers torch sentencepiece requests matplotlib
 
       - name: Run daily collection
         run: python scripts/daily_update.py
