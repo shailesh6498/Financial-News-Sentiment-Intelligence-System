@@ -205,4 +205,30 @@ def run_daily_update():
         sentiment_path=SENTIMENT_FILTERED_PATH,
         save_path=FEATURES_PATH,
     )
-    real
+    real_sentiment_rows = int(
+        (feature_matrix['daily_avg_sentiment'] != 0).sum()
+    )
+    print(f"  Feature matrix shape     : {feature_matrix.shape}")
+    print(f"  Rows with real sentiment : {real_sentiment_rows}")
+
+    # ── step 6: retrain model ───────────────────────────────────
+    print("\nStep 5: Retraining XGBoost...")
+    from src.model import run_full_pipeline
+
+    model, metrics, feature_names = run_full_pipeline(
+        features_path=FEATURES_PATH,
+    )
+    print(f"  Accuracy : {metrics['accuracy']*100:.1f}%")
+    print(f"  AUC-ROC  : {metrics['auc_roc']:.4f}")
+
+    # ── done ────────────────────────────────────────────────────
+    print(f"\n{'='*50}")
+    print(f"Daily update complete : {datetime.now()}")
+    print(f"Total articles        : {len(df_combined)}")
+    print(f"Model accuracy        : {metrics['accuracy']*100:.1f}%")
+    print(f"AUC-ROC               : {metrics['auc_roc']:.4f}")
+    print(f"{'='*50}")
+
+
+if __name__ == "__main__":
+    run_daily_update()
