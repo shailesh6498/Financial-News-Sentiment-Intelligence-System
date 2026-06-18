@@ -49,30 +49,30 @@ def run_daily_update():
     # WHY: collect_all_companies() saves directly to RAW_DATA_PATH,
     # overwriting it with only today's articles. We must preserve
     # the existing history in memory FIRST.
-raw_path = RAW_DATA_PATH
+    raw_path = RAW_DATA_PATH
 
-if os.path.exists(raw_path):
-    df_existing = pd.read_csv(raw_path)
-    print(f"Existing articles BEFORE collection: {len(df_existing)}")
-    if 'date_clean' in df_existing.columns:
-        print(f"Existing dates: {sorted(df_existing['date_clean'].unique())}")
+    if os.path.exists(raw_path):
+        df_existing = pd.read_csv(raw_path)
+        print(f"Existing articles BEFORE collection: {len(df_existing)}")
+        if 'date_clean' in df_existing.columns:
+            print(f"Existing dates: {sorted(df_existing['date_clean'].unique())}")
+        else:
+            print("Existing file has no date_clean column — adding it now")
+            if 'date' in df_existing.columns:
+                def safe_date(d):
+                    try:
+                        return datetime.strptime(
+                            d, "%d %B %Y, %I:%M %p UTC"
+                        ).strftime("%Y-%m-%d")
+                    except Exception:
+                        return "unknown"
+                df_existing['date_clean'] = df_existing['date'].apply(safe_date)
+                df_existing = df_existing[
+                    df_existing['date_clean'] != 'unknown'
+                ]
     else:
-        print("Existing file has no date_clean column — adding it now")
-        if 'date' in df_existing.columns:
-            def safe_date(d):
-                try:
-                    return datetime.strptime(
-                        d, "%d %B %Y, %I:%M %p UTC"
-                    ).strftime("%Y-%m-%d")
-                except Exception:
-                    return "unknown"
-            df_existing['date_clean'] = df_existing['date'].apply(safe_date)
-            df_existing = df_existing[
-                df_existing['date_clean'] != 'unknown'
-            ]
-else:
-    df_existing = pd.DataFrame()
-    print("No existing data found — starting fresh")
+        df_existing = pd.DataFrame()
+        print("No existing data found — starting fresh")
 
     # step 1: collect new articles
     # NOTE: this OVERWRITES raw_path with only today's articles
