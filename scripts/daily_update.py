@@ -44,28 +44,50 @@ def run_daily_update():
     print(f"Daily update started: {datetime.now()}")
     print(f"Companies: {COMPANIES}")
     print()
+    
+# step 0: BACKUP existing data BEFORE collection overwrites it
+    # WHY: collect_all_companies() saves directly to RAW_DATA_PATH,
+    # overwriting it with only today's articles. We must preserve
+    # the existing history in memory FIRST.
+    raw_path = RAW_DATA_PATH
+
+    if os.path.exists(raw_path):
+        df_existing = pd.read_csv(raw_path)
+        print(f"Existing articles BEFORE collection: {len(df_existing)}")
+        print(f"Existing dates: {sorted(df_existing['date_clean'].unique())}")
+    else:
+        df_existing = pd.DataFrame()
+        print("No existing data found")
 
     # step 1: collect new articles
-    print("Step 1: Collecting news...")
+    # NOTE: this OVERWRITES raw_path with only today's articles
+    # df_existing above already safely captured the history
+    print("\nStep 1: Collecting news...")
     from src.data_collector import collect_all_companies
     df_new = collect_all_companies()
     print(f"  Collected: {len(df_new)} articles")
 
-    # step 2: append to existing raw data
-    raw_path = RAW_DATA_PATH
-    if os.path.exists(raw_path):
-        df_existing = pd.read_csv(raw_path)
+    # step 2: merge preserved history with new articles
+    if not df_existing.empty:
         df_combined = pd.concat(
             [df_existing, df_new], ignore_index=True
-        )
-        df_combined = df_combined.drop_duplicates(
-            subset=["title"]
         )
     else:
         df_combined = df_new
 
+    df_combined = df_combined.drop_duplicates(
+        subset=["title"], keep="first"
+    )
+    df_combined = df_combined.sort_values(
+        ["ticker", "date_clean"]
+    ).reset_index(drop=True)
+
+    # save the TRUE combined dataset, overwriting the
+    # today-only file that collect_all_companies() created
     df_combined.to_csv(raw_path, index=False)
-    print(f"  Total raw articles: {len(df_combined)}")
+
+    print(f"\nCombined total: {len(df_combined)} articles")
+    print(f"Combined dates: {sorted(df_combined['date_clean'].unique())}")
 
     # step 3: run EDA cleaning
     print("\nStep 2: Cleaning data...")
