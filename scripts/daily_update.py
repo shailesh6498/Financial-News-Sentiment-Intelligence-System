@@ -49,7 +49,7 @@ def run_daily_update():
     # WHY: collect_all_companies() saves directly to RAW_DATA_PATH,
     # overwriting it with only today's articles. We must preserve
     # the existing history in memory FIRST.
-    raw_path = RAW_DATA_PATH
+raw_path = RAW_DATA_PATH
 
 if os.path.exists(raw_path):
     df_existing = pd.read_csv(raw_path)
