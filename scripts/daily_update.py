@@ -63,16 +63,16 @@ def run_daily_update():
                     try:
                         return datetime.strptime(
                             d, "%d %B %Y, %I:%M %p UTC"
-                        ).strftime("%Y-%m-%d")
+                            ).strftime("%Y-%m-%d")
                     except Exception:
                         return "unknown"
                 df_existing['date_clean'] = df_existing['date'].apply(safe_date)
                 df_existing = df_existing[
                     df_existing['date_clean'] != 'unknown'
-                ]
-    else:
-        df_existing = pd.DataFrame()
-        print("No existing data found — starting fresh")
+                    ]
+            else:
+                df_existing = pd.DataFrame()
+                print("No existing data found — starting fresh")
 
     # step 1: collect new articles
     # NOTE: this OVERWRITES raw_path with only today's articles
