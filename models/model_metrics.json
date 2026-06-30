@@ -1,45 +1,45 @@
 {
-  "accuracy": 0.5231,
-  "precision": 0.482,
-  "recall": 0.7614,
-  "f1_score": 0.5903,
-  "auc_roc": 0.5943,
+  "accuracy": 0.52,
+  "precision": 0.4867,
+  "recall": 0.7935,
+  "f1_score": 0.6033,
+  "auc_roc": 0.5691,
   "confusion_matrix": [
     [
-      35,
-      72
+      31,
+      77
     ],
     [
-      21,
-      67
+      19,
+      73
     ]
   ],
-  "n_test_samples": 195,
+  "n_test_samples": 200,
   "n_train_samples": 100,
-  "test_up_pct": 45.1,
-  "pred_up_pct": 71.3,
+  "test_up_pct": 46.0,
+  "pred_up_pct": 75.0,
   "top_features": [
-    "is_friday",
     "day_of_week",
     "week_of_year",
+    "daily_return",
+    "daily_return_lag2",
+    "is_monday",
     "daily_return_lag3",
     "volume_change_lag1",
     "volume_change_lag2",
-    "price_vs_5day_avg",
-    "daily_return_lag1",
-    "daily_return_lag2",
+    "volume_change",
     "volume_change_lag3"
   ],
   "top_feature_scores": [
-    0.1719,
-    0.1018,
-    0.1011,
+    0.0877,
+    0.0798,
+    0.0757,
     0.0746,
-    0.0676,
-    0.0663,
-    0.0642,
-    0.0597,
-    0.0582,
-    0.0579
+    0.0737,
+    0.0709,
+    0.0696,
+    0.0672,
+    0.0665,
+    0.064
   ]
 }
