@@ -1,23 +1,23 @@
 {
-  "accuracy": 0.4881,
-  "precision": 0.4873,
+  "accuracy": 0.4904,
+  "precision": 0.4863,
   "recall": 0.6949,
-  "f1_score": 0.5729,
-  "auc_roc": 0.5038,
+  "f1_score": 0.5721,
+  "auc_roc": 0.5082,
   "confusion_matrix": [
     [
-      97,
-      242
+      101,
+      243
     ],
     [
       101,
       230
     ]
   ],
-  "n_test_samples": 670,
+  "n_test_samples": 675,
   "n_train_samples": 100,
-  "test_up_pct": 49.4,
-  "pred_up_pct": 70.4,
+  "test_up_pct": 49.0,
+  "pred_up_pct": 70.1,
   "top_features": [
     "day_of_week",
     "week_of_year",
