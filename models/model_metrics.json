@@ -1,45 +1,45 @@
 {
-  "accuracy": 0.4681,
-  "precision": 0.4668,
-  "recall": 0.6784,
-  "f1_score": 0.553,
-  "auc_roc": 0.5034,
+  "accuracy": 0.4859,
+  "precision": 0.4816,
+  "recall": 0.6801,
+  "f1_score": 0.5639,
+  "auc_roc": 0.505,
   "confusion_matrix": [
     [
-      98,
-      265
+      109,
+      254
     ],
     [
-      110,
-      232
+      111,
+      236
     ]
   ],
-  "n_test_samples": 705,
+  "n_test_samples": 710,
   "n_train_samples": 100,
-  "test_up_pct": 48.5,
-  "pred_up_pct": 70.5,
+  "test_up_pct": 48.9,
+  "pred_up_pct": 69.0,
   "top_features": [
     "day_of_week",
     "week_of_year",
-    "is_monday",
-    "daily_return_lag3",
     "daily_return",
     "daily_return_lag2",
+    "is_monday",
+    "daily_return_lag3",
     "volume_change_lag1",
     "volume_change_lag2",
     "volume_change",
     "volume_change_lag3"
   ],
   "top_feature_scores": [
-    0.0903,
-    0.0853,
+    0.0877,
+    0.0798,
+    0.0757,
     0.0746,
-    0.0727,
-    0.0726,
-    0.0716,
-    0.0697,
-    0.069,
-    0.0671,
-    0.0667
+    0.0737,
+    0.0709,
+    0.0696,
+    0.0672,
+    0.0665,
+    0.064
   ]
 }
